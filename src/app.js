@@ -12,6 +12,10 @@ import ticketsRoutes from "./routes/tickets.js";
 import transactionsRoutes from "./routes/transactions.js";
 import resetDbRoutes from "./routes/resetDb.js";
 import googleRoutes from "./routes/google.js";
+import matchSimulationsRoutes from "./routes/matchSimulations.js";
+import simulationEventsRoutes from "./routes/simulationEvents.js";
+import matchSimulationsAdminRoutes from "./routes/admin/matchSimulationsAdmin.js";
+import simulationEventsAdminRoutes from "./routes/admin/simulationEventsAdmin.js";
 import { sequelize } from "../db.js";
 import User from "./models/user.js";
 import { seedInitUserAdmin } from "./seeds/auth.seed.js";
@@ -22,7 +26,8 @@ import { seedInitSoccerStands } from "./seeds/soccerStand.seed.js";
 import MatchStandPrice from "./models/matchStandPrice.js";
 import Ticket from "./models/ticket.js";
 import Transaction from "./models/transaction.js";
-
+import SimulationEvent from "./models/simulationEvent.js";
+import MatchSimulation from "./models/matchSimulation.js";
 
 const app = express();
 
@@ -75,6 +80,8 @@ const testDbConnection = async () => {
     await MatchStandPrice.sync({ alter: true });
     await Transaction.sync({ alter: true });
     await Ticket.sync({ alter: true });
+    await MatchSimulation.sync({ alter: true });
+    await SimulationEvent.sync({ alter: true });
     await seedInitUserAdmin();
     await seedInitSoccerStands();
     console.log("Database connected");

@@ -7,16 +7,16 @@ export const SimulationEvent = sequelize.define(
   "simulations_events",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
     },
     id_teams: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
       allowNull: false,
     },
     id_match_simulations: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
       allowNull: false,
     },
     minute: {
@@ -38,12 +38,16 @@ export const SimulationEvent = sequelize.define(
     },
   },
   {
+    schema: "hr",
     timestamps: false,
     tableName: "simulations_events",
   }
 );
 
 SimulationEvent.belongsTo(Team, { as: "team", foreignKey: "id_teams" });
-SimulationEvent.belongsTo(MatchSimulation, { as: "match_simulation", foreignKey: "id_match_simulations" });
+SimulationEvent.belongsTo(MatchSimulation, {
+  as: "match_simulation",
+  foreignKey: "id_match_simulations",
+});
 
 export default SimulationEvent;

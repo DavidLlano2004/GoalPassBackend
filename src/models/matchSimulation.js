@@ -6,12 +6,12 @@ export const MatchSimulation = sequelize.define(
   "match_simulations",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
     },
     id_matches: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
       allowNull: false,
     },
     local_goals: {
@@ -66,6 +66,7 @@ export const MatchSimulation = sequelize.define(
     },
   },
   {
+    schema: "hr",
     timestamps: false,
     tableName: "match_simulations",
   }
