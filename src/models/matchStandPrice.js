@@ -41,6 +41,10 @@ MatchStandPrice.belongsTo(Match, {
   onDelete: "CASCADE",
 });
 
-MatchStandPrice.belongsTo(SoccerStand, { as: "stand", foreignKey: "id_stand" });
+MatchStandPrice.belongsTo(SoccerStand, {
+  as: "stand",
+  foreignKey: "id_stand",
+  onDelete: "CASCADE",
+});
 
 export default MatchStandPrice;

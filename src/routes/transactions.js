@@ -28,6 +28,7 @@ router.get(
   authorizeRoles("administrador"),
   transactionController.getTransactions
 );
+
 router.get("/:id", authenticate, transactionController.getTransactionById); // owner or admin
 router.put(
   "/:id",

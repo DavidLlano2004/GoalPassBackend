@@ -53,8 +53,15 @@ export const Transaction = sequelize.define(
   }
 );
 
-Transaction.belongsTo(User, { as: "user", foreignKey: "id_users" });
-Transaction.belongsTo(Match, { as: "match", foreignKey: "id_matches" });
-
+Transaction.belongsTo(User, {
+  as: "user",
+  foreignKey: "id_users",
+  onDelete: "CASCADE",
+});
+Transaction.belongsTo(Match, {
+  as: "match",
+  foreignKey: "id_matches",
+  onDelete: "CASCADE",
+});
 
 export default Transaction;

@@ -1,11 +1,11 @@
 import { Team } from "../models/team.js";
 import { v4 as uuidv4 } from "uuid";
 
-
 // Crear equipo (admin)
 export const createTeam = async (req, res) => {
   try {
-    const { name, city, stadium, image_url ,foundation } = req.body;
+    const { name, city, stadium, image_url, foundation, id_team_api } =
+      req.body;
     if (!name || !stadium)
       return res.status(400).json({ message: "name and stadium are required" });
 
@@ -16,6 +16,7 @@ export const createTeam = async (req, res) => {
       stadium,
       image_url: image_url || null,
       foundation: foundation || null,
+      id_team_api: id_team_api,
     });
     return res.status(201).json({ team });
   } catch (err) {

@@ -12,6 +12,8 @@ import ticketsRoutes from "./routes/tickets.js";
 import transactionsRoutes from "./routes/transactions.js";
 import resetDbRoutes from "./routes/resetDb.js";
 import googleRoutes from "./routes/google.js";
+import reportsRoutes from "./routes/reports.js";
+import dashboardRoutes from "./routes/dashboard.js";
 import matchSimulationsRoutes from "./routes/matchSimulations.js";
 import simulationEventsRoutes from "./routes/simulationEvents.js";
 import matchSimulationsAdminRoutes from "./routes/admin/matchSimulationsAdmin.js";
@@ -64,12 +66,10 @@ app.use("/api/reset-database", resetDbRoutes);
 
 app.use("/api/auth/google", googleRoutes);
 
-// REDIRIGE A GOOGLE LOGIN
+app.use("/api/reports", reportsRoutes);
 
-// Salud básica
-app.get("/", (req, res) => res.json({ ok: true }));
+app.use("/api/dashboard", dashboardRoutes);
 
-// Asegurarse de que la conexión a la base de datos esté establecida antes de exportar la app
 const testDbConnection = async () => {
   try {
     await sequelize.authenticate();

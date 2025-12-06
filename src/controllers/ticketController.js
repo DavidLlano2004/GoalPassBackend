@@ -438,7 +438,7 @@ const getAvailabilityStatus = (available, capacity) => {
 
   const percentage = (available / capacity) * 100;
 
-  if (percentage <= 10) return "Pocas disponibles";
+  if (percentage <= 30) return "Pocas disponibles";
 
   return "Disponibles";
 };

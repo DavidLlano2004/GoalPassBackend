@@ -2,6 +2,7 @@ import express from "express";
 import { body } from "express-validator";
 import * as matchSimController from "../controllers/matchSimulationController.js";
 import { authenticate, authorizeRoles } from "../middlewares/auth.js";
+import { getMatchSimulation, simulateMatch } from "../controllers/simulationMatchController.js";
 
 const router = express.Router();
 
@@ -10,6 +11,20 @@ router.get("/", matchSimController.getMatchSimulations);
 router.get("/:id", matchSimController.getMatchSimulationById);
 
 // Admin writes
+router.post(
+  "/:matchId/simulate",
+  authenticate,
+  authorizeRoles("administrador"),
+  simulateMatch
+);
+
+router.get(
+  "/:matchId/simulate",
+  authenticate,
+  authorizeRoles("administrador"),
+  getMatchSimulation
+);
+
 router.post(
   "/",
   authenticate,

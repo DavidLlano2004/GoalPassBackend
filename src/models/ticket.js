@@ -71,16 +71,26 @@ export const Ticket = sequelize.define(
   }
 );
 
-Ticket.belongsTo(User, { as: "user", foreignKey: "id_users" });
-Ticket.belongsTo(Match, { as: "match", foreignKey: "id_matches" });
+Ticket.belongsTo(User, {
+  as: "user",
+  foreignKey: "id_users",
+  onDelete: "CASCADE",
+});
+Ticket.belongsTo(Match, {
+  as: "match",
+  foreignKey: "id_matches",
+  onDelete: "CASCADE",
+});
 Ticket.belongsTo(MatchStandPrice, {
   as: "msp",
   foreignKey: "id_match_stand_price",
+  onDelete: "CASCADE",
 });
 
 Ticket.belongsTo(Transaction, {
   as: "transaction",
   foreignKey: "id_transaction",
+  onDelete: "CASCADE",
 });
 
 export default Ticket;
