@@ -73,23 +73,27 @@ app.get("/", (req, res) => res.json({ ok: true }));
 const testDbConnection = async () => {
   try {
     await sequelize.authenticate();
-    await User.sync({ alter: true });
-    await Team.sync({ alter: true });
-    await Match.sync({ alter: true });
-    await SoccerStand.sync({ alter: true });
-    await MatchStandPrice.sync({ alter: true });
-    await Transaction.sync({ alter: true });
-    await Ticket.sync({ alter: true });
-    await MatchSimulation.sync({ alter: true });
-    await SimulationEvent.sync({ alter: true });
-    await seedInitUserAdmin();
-    await seedInitSoccerStands();
+    if (process.env.NODE_ENV !== "test") {
+      await User.sync({ alter: true });
+      await Team.sync({ alter: true });
+      await Match.sync({ alter: true });
+      await SoccerStand.sync({ alter: true });
+      await MatchStandPrice.sync({ alter: true });
+      await Transaction.sync({ alter: true });
+      await Ticket.sync({ alter: true });
+      await MatchSimulation.sync({ alter: true });
+      await SimulationEvent.sync({ alter: true });
+      await seedInitUserAdmin();
+      await seedInitSoccerStands();
+    }
     console.log("Database connected");
   } catch (err) {
     console.error("Unable to connect to DB:", err);
   }
 };
 
-testDbConnection();
+if (process.env.NODE_ENV !== "test") {
+  testDbConnection();
+}
 
 export default app;
