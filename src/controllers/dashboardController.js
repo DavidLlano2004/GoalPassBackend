@@ -26,58 +26,115 @@ export const getDashboardStatsOptimized = async (req, res) => {
       ),
       
       upcoming_matches AS (
-  SELECT 
-    m.id as match_id,
-    CONCAT(tl.name, ' vs ', tv.name) as match_name,
-    -- 🔥 Traducción manual de meses
-    CONCAT(
-      TO_CHAR(m.match_date, 'DD'),
-      ' de ',
-      CASE EXTRACT(MONTH FROM m.match_date)
-        WHEN 1 THEN 'enero'
-        WHEN 2 THEN 'febrero'
-        WHEN 3 THEN 'marzo'
-        WHEN 4 THEN 'abril'
-        WHEN 5 THEN 'mayo'
-        WHEN 6 THEN 'junio'
-        WHEN 7 THEN 'julio'
-        WHEN 8 THEN 'agosto'
-        WHEN 9 THEN 'septiembre'
-        WHEN 10 THEN 'octubre'
-        WHEN 11 THEN 'noviembre'
-        WHEN 12 THEN 'diciembre'
-      END,
-      ' de ',
-      TO_CHAR(m.match_date, 'YYYY')
-    ) as formatted_date,
-    m.match_hour,
-    m.stadium,
-    COALESCE(SUM(ss.total_capacity), 0) as total_capacity,
-    COALESCE(COUNT(tk.id), 0) as tickets_sold,
-    CASE 
-      WHEN COALESCE(SUM(ss.total_capacity), 0) > 0 
-      THEN ROUND((COUNT(tk.id) * 100.0 / SUM(ss.total_capacity)), 2)
-      ELSE 0 
-    END as occupancy_percentage,
-    CASE 
-      WHEN COALESCE(SUM(ss.total_capacity), 0) = 0 THEN 'Sin capacidad'
-      WHEN (COUNT(tk.id) * 100.0 / SUM(ss.total_capacity)) >= 70 THEN 'Alto'
-      WHEN (COUNT(tk.id) * 100.0 / SUM(ss.total_capacity)) >= 40 THEN 'Medio'
-      ELSE 'Bajo'
-    END as occupancy_level
-  FROM hr.matches m
-  LEFT JOIN hr.teams tl ON m.id_team_local = tl.id
-  LEFT JOIN hr.teams tv ON m.id_team_visitor = tv.id
-  LEFT JOIN hr.match_stand_prices msp ON m.id = msp.id_match
-  LEFT JOIN hr.soccer_stands ss ON msp.id_stand = ss.id
-  LEFT JOIN hr.tickets tk ON m.id = tk.id_matches 
-    AND tk.state = 'vendido'
-  WHERE m.state NOT IN ('finalizado', 'cancelado')
-    AND m.match_date >= CURRENT_DATE
-  GROUP BY m.id, m.match_date, m.match_hour, m.stadium, tl.name, tv.name
-  ORDER BY m.match_date ASC, m.match_hour ASC
-  LIMIT 10
-),
+        SELECT 
+          m.id as match_id,
+          CONCAT(tl.name, ' vs ', tv.name) as match_name,
+          -- 🔥 Traducción manual de meses
+          CONCAT(
+            TO_CHAR(m.match_date, 'DD'),
+            ' de ',
+            CASE EXTRACT(MONTH FROM m.match_date)
+              WHEN 1 THEN 'enero'
+              WHEN 2 THEN 'febrero'
+              WHEN 3 THEN 'marzo'
+              WHEN 4 THEN 'abril'
+              WHEN 5 THEN 'mayo'
+              WHEN 6 THEN 'junio'
+              WHEN 7 THEN 'julio'
+              WHEN 8 THEN 'agosto'
+              WHEN 9 THEN 'septiembre'
+              WHEN 10 THEN 'octubre'
+              WHEN 11 THEN 'noviembre'
+              WHEN 12 THEN 'diciembre'
+            END,
+            ' de ',
+            TO_CHAR(m.match_date, 'YYYY')
+          ) as formatted_date,
+          m.match_hour,
+          m.stadium,
+          -- 🔥 CORRECCIÓN: Suma de capacidad solo de las tribunas asociadas al partido
+          (
+            SELECT COALESCE(SUM(ss.total_capacity), 0)
+            FROM hr.match_stand_prices msp2
+            JOIN hr.soccer_stands ss ON msp2.id_stand = ss.id
+            WHERE msp2.id_match = m.id
+          ) as total_capacity,
+          -- 🔥 CORRECCIÓN: Tickets vendidos solo para este partido
+          (
+            SELECT COALESCE(COUNT(tk2.id), 0)
+            FROM hr.tickets tk2
+            WHERE tk2.id_matches = m.id
+              AND tk2.state = 'vendido'
+          ) as tickets_sold,
+          -- 🔥 Cálculo corregido del porcentaje de ocupación
+          CASE 
+            WHEN (
+              SELECT COALESCE(SUM(ss2.total_capacity), 0)
+              FROM hr.match_stand_prices msp3
+              JOIN hr.soccer_stands ss2 ON msp3.id_stand = ss2.id
+              WHERE msp3.id_match = m.id
+            ) > 0 
+            THEN ROUND((
+              (
+                SELECT COALESCE(COUNT(tk3.id), 0)
+                FROM hr.tickets tk3
+                WHERE tk3.id_matches = m.id
+                  AND tk3.state = 'vendido'
+              ) * 100.0 / 
+              (
+                SELECT COALESCE(SUM(ss3.total_capacity), 0)
+                FROM hr.match_stand_prices msp4
+                JOIN hr.soccer_stands ss3 ON msp4.id_stand = ss3.id
+                WHERE msp4.id_match = m.id
+              )
+            ), 2)
+            ELSE 0 
+          END as occupancy_percentage,
+          CASE 
+            WHEN (
+              SELECT COALESCE(SUM(ss4.total_capacity), 0)
+              FROM hr.match_stand_prices msp5
+              JOIN hr.soccer_stands ss4 ON msp5.id_stand = ss4.id
+              WHERE msp5.id_match = m.id
+            ) = 0 THEN 'Sin capacidad'
+            WHEN ROUND((
+              (
+                SELECT COALESCE(COUNT(tk4.id), 0)
+                FROM hr.tickets tk4
+                WHERE tk4.id_matches = m.id
+                  AND tk4.state = 'vendido'
+              ) * 100.0 / 
+              (
+                SELECT COALESCE(SUM(ss5.total_capacity), 0)
+                FROM hr.match_stand_prices msp6
+                JOIN hr.soccer_stands ss5 ON msp6.id_stand = ss5.id
+                WHERE msp6.id_match = m.id
+              )
+            ), 2) >= 70 THEN 'Alto'
+            WHEN ROUND((
+              (
+                SELECT COALESCE(COUNT(tk5.id), 0)
+                FROM hr.tickets tk5
+                WHERE tk5.id_matches = m.id
+                  AND tk5.state = 'vendido'
+              ) * 100.0 / 
+              (
+                SELECT COALESCE(SUM(ss6.total_capacity), 0)
+                FROM hr.match_stand_prices msp7
+                JOIN hr.soccer_stands ss6 ON msp7.id_stand = ss6.id
+                WHERE msp7.id_match = m.id
+              )
+            ), 2) >= 40 THEN 'Medio'
+            ELSE 'Bajo'
+          END as occupancy_level
+        FROM hr.matches m
+        LEFT JOIN hr.teams tl ON m.id_team_local = tl.id
+        LEFT JOIN hr.teams tv ON m.id_team_visitor = tv.id
+        WHERE m.state NOT IN ('finalizado', 'cancelado')
+          AND m.match_date >= CURRENT_DATE
+        ORDER BY m.match_date ASC, m.match_hour ASC
+        LIMIT 10
+      ),
       
       upcoming_count AS (
         SELECT COUNT(*) as upcoming_matches_count
