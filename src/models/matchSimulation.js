@@ -22,6 +22,26 @@ export const MatchSimulation = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    local_goals_first_half: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    local_goals_second_half: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    visitor_goals_first_half: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    visitor_goals_second_half: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     local_possession: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true,
@@ -72,6 +92,10 @@ export const MatchSimulation = sequelize.define(
   }
 );
 
-MatchSimulation.belongsTo(Match, { as: "match", foreignKey: "id_matches" });
+MatchSimulation.belongsTo(Match, {
+  as: "match",
+  foreignKey: "id_matches",
+  onDelete: "CASCADE",
+});
 
 export default MatchSimulation;

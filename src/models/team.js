@@ -9,6 +9,10 @@ export const Team = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    id_team_api: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,

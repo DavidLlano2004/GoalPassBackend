@@ -71,7 +71,15 @@ export const Match = sequelize.define(
 );
 
 // Asoociaciones
-Match.belongsTo(Team, { as: "local", foreignKey: "id_team_local" });
-Match.belongsTo(Team, { as: "visitor", foreignKey: "id_team_visitor" });
+Match.belongsTo(Team, {
+  as: "local",
+  foreignKey: "id_team_local",
+  onDelete: "CASCADE",
+});
+Match.belongsTo(Team, {
+  as: "visitor",
+  foreignKey: "id_team_visitor",
+  onDelete: "CASCADE",
+});
 
 export default Match;

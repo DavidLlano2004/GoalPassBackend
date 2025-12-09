@@ -44,10 +44,15 @@ export const SimulationEvent = sequelize.define(
   }
 );
 
-SimulationEvent.belongsTo(Team, { as: "team", foreignKey: "id_teams" });
+SimulationEvent.belongsTo(Team, {
+  as: "team",
+  foreignKey: "id_teams",
+  onDelete: "CASCADE",
+});
 SimulationEvent.belongsTo(MatchSimulation, {
   as: "match_simulation",
   foreignKey: "id_match_simulations",
+  onDelete: "CASCADE",
 });
 
 export default SimulationEvent;
