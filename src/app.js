@@ -28,6 +28,7 @@ import { seedInitSoccerStands } from "./seeds/soccerStand.seed.js";
 import MatchStandPrice from "./models/matchStandPrice.js";
 import Ticket from "./models/ticket.js";
 import Transaction from "./models/transaction.js";
+
 import SimulationEvent from "./models/simulationEvent.js";
 import MatchSimulation from "./models/matchSimulation.js";
 
